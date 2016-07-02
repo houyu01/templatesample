@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+    </head>
+    <body>
+        <div id="content1"></div>
+        <div id="content2"></div>
+        <script>
+            // 这是我们的模板，怎么样，比直接写html字符串拼装看起来清爽多了吧？
+            var template = ''
+            +'<div>'
+            +   '{%=a%}'
+            +   '{%if (a===1){%}'
+            +       '<span>'
+            +           'a是1'
+            +       '</span>'
+            +   '{%}%}'
+            +'</div>';
+            // 能解析输出与if条件语句的函数
+            function TEMPLATEparser(template, variables) {
+                // 语法替换
+                var funcStr = template
+                .replace(/\{\%\=(\w+)\%\}/, function (code, variable) {
+                    return '"; str += "' + variable + '"; str += "';
+                })
+                .replace(/\{\%(if.*?)\%\}(.*?)\{\%(\})\%\}/, function (code, judge, content, end) {
+                    return '";' + judge + 'str+="' + content + '";' + end + 'str += "';
+                });
+                // 返回拼装函数
+                return new Function(variables, 'var str = ""; str += "' + funcStr + '";return str;');
+            }
+
+            // 实验使用模板引擎去解析并传入变量生成模板
+            var outHTML = TEMPLATEparser(template, ['a'])(1);
+            document.getElementById('content1').innerHTML = outHTML;
+            outHTML = TEMPLATEparser(template, ['a'])(2);
+            document.getElementById('content2').innerHTML = outHTML;
+        </script>
+    </body>
+</html>
